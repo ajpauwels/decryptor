@@ -59,3 +59,12 @@ typings/
 
 # next.js build output
 .next
+
+# don't upload the envs folder
+/envs
+
+# don't upload TLS certs
+/tls
+
+# don't include tern-port files
+.tern-port
