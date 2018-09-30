@@ -3,8 +3,8 @@ import path from 'path';
 import fs from 'fs';
 import express from 'express';
 import https from 'https';
-import { TLSSocket } from 'tls';
 import helmet from 'helmet';
+import session from 'express-session';
 
 // Third-party middleware
 import bodyParser from 'body-parser';
@@ -23,8 +23,18 @@ import indexRoutes from './routes/index';
 // Create the express app
 const app = express();
 
+// Use pug to render views
+app.set('views', 'src/views');
+app.set('view engine', 'pug');
+
 // Attach Helmet to enforce certain security parameters
-app.use(helmet());
+app.use(helmet({
+	frameguard: false
+}));
+app.use(helmet.noCache());
+
+// Define public assets folder
+app.use(express.static('src/public'));
 
 // Attach JSON and URL-encoded body parsers
 app.use(bodyParser.json({
@@ -35,6 +45,13 @@ app.use(bodyParser.json({
 	]
 }));
 app.use(bodyParser.urlencoded({ extended: false }));
+
+// Attach session-handling middleware
+app.use(session({
+	secret: Util.getSessionSecret(),
+	resave: false,
+	saveUninitialized: false
+}));
 
 // Attach express routes
 app.use('/', indexRoutes);
@@ -48,7 +65,7 @@ let httpsServer: https.Server;
 // Get the SSL keys
 const tlsKey: string = process.env['SERVER_KEY'];
 const tlsCert: string = process.env['SERVER_CERT'];
-const caChain: string = process.env['CA_CHAIN'];
+const caChain: string = process.env['SERVER_CA_CHAIN'];
 
 // Start the server with the given TLS certs
 start(tlsKey, tlsCert, caChain);

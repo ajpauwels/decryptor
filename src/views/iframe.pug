@@ -1,0 +1,6 @@
+html
+	head
+		link(rel='stylesheet', type='text/css', href='/css/global.css')
+
+	body
+		iframe#secureIframe(src=`/secure/${keyPaths}?iframeToken=${hashedValue}&date=${Date.now()}`, name=Date.now())

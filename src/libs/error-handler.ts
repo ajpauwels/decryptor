@@ -31,7 +31,25 @@ export class ErrorWithStatusCode extends Error {
 	}
 }
 
-export function handleValidationErrors(req?: any, res?: Response, next?: NextFunction) {
+export function handleAxiosErrors(err: any, req?: Request, res?: Response, next?: NextFunction) {
+	if (err.response) {
+		const resp: any = err.response.data;
+		const newErr = new ErrorWithStatusCode(resp.message, resp.statusCode);
+
+		return next(newErr);
+	}
+	else if (err.request) {
+		const newErr = new ErrorWithStatusCode('No response from storage server', 502);
+
+		return next(newErr);
+	} else {
+		const newErr = new ErrorWithStatusCode(err.message, 500);
+
+		return next(newErr);
+	}
+}
+
+export function handleValidationErrors(req?: Request, res?: Response, next?: NextFunction) {
 	const validationResultObj: Result = validationResult(req);
 
 	if (!validationResultObj.isEmpty()) {
