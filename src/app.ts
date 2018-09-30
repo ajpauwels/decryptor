@@ -4,6 +4,7 @@ import fs from 'fs';
 import express from 'express';
 import https from 'https';
 import { TLSSocket } from 'tls';
+import helmet from 'helmet';
 
 // Third-party middleware
 import bodyParser from 'body-parser';
@@ -21,6 +22,9 @@ import indexRoutes from './routes/index';
 
 // Create the express app
 const app = express();
+
+// Attach Helmet to enforce certain security parameters
+app.use(helmet());
 
 // Attach JSON and URL-encoded body parsers
 app.use(bodyParser.json({
