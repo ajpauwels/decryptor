@@ -63,6 +63,9 @@ router.get('/secure/:keyPaths', async (req: Request, res: Response, next: NextFu
 	const queryToken = req.query.iframeToken;
 	const sessionToken = req.session.iframeToken;
 
+	// One-time use token
+	delete req.session.iframeToken;
+
 	if (queryToken !== sessionToken) {
 		const err = new ErrorWithStatusCode('Rejected', 400);
 		return next(err);
@@ -86,7 +89,6 @@ router.get('/secure/:keyPaths', async (req: Request, res: Response, next: NextFu
 			val = val[keyPath];
 		}
 
-		delete req.session.iframeToken;
 		return res.render('secure', { inIframe: true, value: val });
 	} catch (err) {
 		return handleAxiosErrors(err, req, res, next);
