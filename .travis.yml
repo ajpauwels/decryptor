@@ -6,12 +6,12 @@ before_script:
 script:
   - "npm run test"
 env:
-  - SERVER_KEY=$(cat ./tls/server.key.pem)
-  - SERVER_CERT=$(cat ./tls/server.cert.pem)
-  - SERVER_CA_CHAIN=$(cat ./tls/intermediate.root.cert.pem)
-  - CLIENT_KEY=$(cat ./tls/tester.key.pem)
-  - CLIENT_CERT=$(cat ./tls/tester.cert.pem)
-  - CLIENT_CA_CHAIN=$(cat ./tls/intermediate.root.cert.pem)
+  - SERVER_KEY=$(cat ./src/tests/tls/server.key.pem)
+  - SERVER_CERT=$(cat ./src/tests/tls/server.cert.pem)
+  - SERVER_CA_CHAIN=$(cat ./src/tests/tls/intermediate.root.cert.pem)
+  - CLIENT_KEY=$(cat ./src/tests/tls/tester.key.pem)
+  - CLIENT_CERT=$(cat ./src/tests/tls/tester.cert.pem)
+  - CLIENT_CA_CHAIN=$(cat ./src/tests/tls/intermediate.root.cert.pem)
   - SESSION_SECRET=travisSessionSecret
   - STORAGE_URL=https://localhost:3002
   - ZONE=testing
