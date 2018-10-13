@@ -1,3 +1,5 @@
+import fs from 'fs';
+
 export default class Util {
 	static getZone(): string {
 		// Establish which zone we're running in
@@ -7,7 +9,7 @@ export default class Util {
 		if (!envZONE || envZONE === 'undefined' || envZONE === 'null') zone = 'prod';
 		else zone = envZONE;
 
-		const acceptedZones = ['dev', 'staging', 'prod', 'test'];
+		const acceptedZones = ['dev', 'staging', 'prod', 'testing'];
 		if (acceptedZones.indexOf(zone) === -1) {
 			zone = 'prod';
 		}
@@ -23,28 +25,46 @@ export default class Util {
 		else return parsedEnv;
 	}
 
+	static getServerKey(): string {
+		const keyPath: string = process.env['SERVER_KEY'];
+		if (!keyPath) return undefined;
+
+		return fs.readFileSync(keyPath).toString();
+	}
+
+	static getServerCert(): string {
+		const certPath: string = process.env['SERVER_CERT'];
+		if (!certPath) return undefined;
+
+		return fs.readFileSync(certPath).toString();
+	}
+
+	static getServerCAChain(): string {
+		const caChainPath: string = process.env['SERVER_CA_CHAIN'];
+		if (!caChainPath) return undefined;
+
+		return fs.readFileSync(caChainPath).toString();
+	}
+
 	static getClientKey(): string {
-		const keyEnv: string = process.env['CLIENT_KEY'];
+		const keyPath: string = process.env['CLIENT_KEY'];
+		if (!keyPath) return undefined;
 
-		if (!keyEnv) return undefined;
-
-		return keyEnv;
+		return fs.readFileSync(keyPath).toString();
 	}
 
 	static getClientCert(): string {
-		const certEnv: string = process.env['CLIENT_CERT'];
+		const certPath: string = process.env['CLIENT_CERT'];
+		if (!certPath) return undefined;
 
-		if (!certEnv) return undefined;
-
-		return certEnv;
+		return fs.readFileSync(certPath).toString();
 	}
 
 	static getClientCAChain(): string {
-		const caChainEnv: string = process.env['CLIENT_CA_CHAIN'];
+		const caChainPath: string = process.env['CLIENT_CA_CHAIN'];
+		if (!caChainPath) return undefined;
 
-		if (!caChainEnv) return undefined;
-
-		return caChainEnv;
+		return fs.readFileSync(caChainPath).toString();
 	}
 
 	static getStorageURL(): string {

@@ -1,6 +1,5 @@
 // Third-party libs
 import path from 'path';
-import fs from 'fs';
 import express from 'express';
 import https from 'https';
 import helmet from 'helmet';
@@ -63,9 +62,9 @@ app.use(errorHandler);
 let httpsServer: https.Server;
 
 // Get the SSL keys
-const tlsKey: string = process.env['SERVER_KEY'];
-const tlsCert: string = process.env['SERVER_CERT'];
-const caChain: string = process.env['SERVER_CA_CHAIN'];
+const tlsKey: string = Util.getServerKey();
+const tlsCert: string = Util.getServerCert();
+const caChain: string = Util.getServerCAChain();
 
 // Start the server with the given TLS certs
 start(tlsKey, tlsCert, caChain);
