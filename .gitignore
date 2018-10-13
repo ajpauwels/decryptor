@@ -61,7 +61,7 @@ typings/
 .next
 
 # don't upload the envs folder
-/envs
+/env
 
 # don't upload TLS certs
 /tls
