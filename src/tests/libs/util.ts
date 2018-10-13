@@ -77,12 +77,12 @@ describe('Util', function() {
 			expect(zone).to.equal('prod');
 		});
 
-		it('should return \'test\' when env var \'ZONE\' is set to \'test\'', function() {
-			process.env['ZONE'] = 'test';
+		it('should return \'testing\' when env var \'ZONE\' is set to \'testing\'', function() {
+			process.env['ZONE'] = 'testing';
 
 			const zone = Util.getZone();
 
-			expect(zone).to.equal('test');
+			expect(zone).to.equal('testing');
 		});
 
 		it('should return \'prod\' when env var \'ZONE\' is undefined', function() {
