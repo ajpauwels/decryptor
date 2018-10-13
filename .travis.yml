@@ -6,16 +6,17 @@ before_script:
 script:
   - "npm run test"
 env:
-  - SERVER_KEY=./src/tests/tls/server.key.pem
-  - SERVER_CERT=./src/tests/tls/server.cert.pem
-  - SERVER_CA_CHAIN=./src/tests/tls/intermediate.root.cert.pem
-  - CLIENT_KEY=./src/tests/tls/tester.key.pem
-  - CLIENT_CERT=./src/tests/tls/tester.cert.pem
-  - CLIENT_CA_CHAIN=./src/tests/tls/intermediate.root.cert.pem
-  - SESSION_SECRET=travisSessionSecret
-  - STORAGE_URL=https://localhost:3002
-  - ZONE=testing
-  - PORT=3000
+  global:
+    - SERVER_KEY=./src/tests/tls/server.key.pem
+    - SERVER_CERT=./src/tests/tls/server.cert.pem
+    - SERVER_CA_CHAIN=./src/tests/tls/intermediate.root.cert.pem
+    - CLIENT_KEY=./src/tests/tls/tester.key.pem
+    - CLIENT_CERT=./src/tests/tls/tester.cert.pem
+    - CLIENT_CA_CHAIN=./src/tests/tls/intermediate.root.cert.pem
+    - SESSION_SECRET=travisSessionSecret
+    - STORAGE_URL=https://localhost:3002
+    - ZONE=testing
+    - PORT=3000
 cache:
   directories:
     - "node modules"
