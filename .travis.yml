@@ -5,6 +5,17 @@ before_script:
   - "npm install"
 script:
   - "npm run test"
+env:
+  - SERVER_KEY=$(cat ./tls/server.key.pem)
+  - SERVER_CERT=$(cat ./tls/server.cert.pem)
+  - SERVER_CA_CHAIN=$(cat ./tls/intermediate.root.cert.pem)
+  - CLIENT_KEY=$(cat ./tls/tester.key.pem)
+  - CLIENT_CERT=$(cat ./tls/tester.cert.pem)
+  - CLIENT_CA_CHAIN=$(cat ./tls/intermediate.root.cert.pem)
+  - SESSION_SECRET=travisSessionSecret
+  - STORAGE_URL=https://localhost:3002
+  - ZONE=testing
+  - PORT=3000
 cache:
   directories:
     - "node modules"
