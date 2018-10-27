@@ -1,16 +1,16 @@
 // Third-party libs
 import chai from 'chai';
-import { start as startServer, stop as stopServer } from '../../app';
-import Util from '../../libs/util';
+import { start as startServer, stop as stopServer } from '../../src/app';
+import Util from '../../src/libs/util';
 import fetch from 'node-fetch';
 import fs from 'fs';
 import path from 'path';
 import https from 'https';
 
 // Load the TLS certs and keys for mutual TLS
-const caCert = fs.readFileSync('./src/tests/tls/intermediate.root.cert.pem').toString();
-const serverKey = fs.readFileSync('./src/tests/tls/server.key.pem').toString();
-const serverCert = fs.readFileSync('./src/tests/tls/server.cert.pem').toString();
+const caCert = fs.readFileSync('./tests/tls/intermediate.root.cert.pem').toString();
+const serverKey = fs.readFileSync('./tests/tls/server.key.pem').toString();
+const serverCert = fs.readFileSync('./tests/tls/server.cert.pem').toString();
 
 // Load the port number to use
 const port = Util.getPort();

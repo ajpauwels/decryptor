@@ -1,6 +1,6 @@
 // Third-party libs
 import chai from 'chai';
-import Logger from '../../libs/logger';
+import Logger from '../../src/libs/logger';
 // import { Logger as WinstonLogger } from 'winston';
 import * as winston from 'winston';
 
@@ -43,7 +43,7 @@ describe('Logger', function() {
 		it('should return a path to the file from the package.json directory as a label when given a valid path', function() {
 			const label = Logger.makeLabel(__filename);
 
-			expect(label).to.be.equal('src/tests/libs/logger.ts');
+			expect(label).to.be.equal('tests/libs/logger.ts');
 		});
 
 		it('should return an empty string when given an empty string', function() {

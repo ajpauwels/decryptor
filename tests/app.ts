@@ -1,17 +1,17 @@
 // Third-party libs
 import chai from 'chai';
-import { start, stop } from '../app';
+import { start, stop } from '../src/app';
 import { spy, stub, SinonSpy, SinonStub } from 'sinon';
-import { ErrorWithStatusCode } from '../libs/error-handler';
+import { ErrorWithStatusCode } from '../src/libs/error-handler';
 import fs from 'fs';
 import { Server } from 'https';
 
 const { expect } = chai;
 
 // Load the TLS certs and keys for mutual TLS
-const caCert = fs.readFileSync('./src/tests/tls/intermediate.root.cert.pem').toString();
-const serverKey = fs.readFileSync('./src/tests/tls/server.key.pem').toString();
-const serverCert = fs.readFileSync('./src/tests/tls/server.cert.pem').toString();
+const caCert = fs.readFileSync('./tests/tls/intermediate.root.cert.pem').toString();
+const serverKey = fs.readFileSync('./tests/tls/server.key.pem').toString();
+const serverCert = fs.readFileSync('./tests/tls/server.cert.pem').toString();
 
 describe('app', function() {
 	describe('#start', function() {
