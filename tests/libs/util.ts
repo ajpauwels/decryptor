@@ -1,5 +1,5 @@
 import chai from 'chai';
-import Util from '../../libs/util';
+import Util from '../../src/libs/util';
 
 const { expect } = chai;
 

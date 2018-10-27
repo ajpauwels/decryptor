@@ -1,7 +1,7 @@
 // Third-party libs
 import http from 'http';
 import chai from 'chai';
-import { ErrorWithStatusCode, handleValidationErrors, errorHandler } from '../../libs/error-handler';
+import { ErrorWithStatusCode, handleValidationErrors, errorHandler } from '../../src/libs/error-handler';
 import { stub, spy, SinonStub, SinonSpy } from 'sinon';
 import { Response, Request } from 'express';
 import * as validate from 'express-validator/check';
