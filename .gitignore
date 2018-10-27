@@ -60,7 +60,7 @@ typings/
 # next.js build output
 .next
 
-# don't upload the envs folder
+# don't upload the non-testing envs folder
 /env
 
 # don't upload TLS certs
@@ -68,3 +68,6 @@ typings/
 
 # don't include tern-port files
 .tern-port
+
+# don't include the compiled typescript /dist folder
+/dist
