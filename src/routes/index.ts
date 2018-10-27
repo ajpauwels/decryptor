@@ -33,10 +33,11 @@ router.get('/', (req: Request, res: Response) => {
 	res.send('Up and running');
 });
 
-router.get('/:keyPaths', async (req: Request, res: Response, next: NextFunction) => {
+router.get('/info/:keyPaths', async (req: Request, res: Response, next: NextFunction) => {
 	// Extract URL params
 	const keyPaths = req.params.keyPaths;
 	const iframeToken = req.session.iframeToken;
+	const css = req.query.css;
 
 	// Use sha256 as our hashing function
 	const sha256 = crypto.createHash('sha256');
@@ -54,14 +55,15 @@ router.get('/:keyPaths', async (req: Request, res: Response, next: NextFunction)
 	req.session.iframeToken = hashedValue;
 
 	// Render the iframe
-	return res.render('iframe', { keyPaths, hashedValue });
+	return res.render('iframe', { keyPaths, hashedValue, css });
 });
 
-router.get('/secure/:keyPaths', async (req: Request, res: Response, next: NextFunction) => {
+router.get('/secure/info/:keyPaths', async (req: Request, res: Response, next: NextFunction) => {
 	// Extract URL params
 	const keyPaths = req.params.keyPaths;
 	const queryToken = req.query.iframeToken;
 	const sessionToken = req.session.iframeToken;
+	const css = req.query.css;
 
 	// One-time use token
 	delete req.session.iframeToken;
@@ -89,7 +91,7 @@ router.get('/secure/:keyPaths', async (req: Request, res: Response, next: NextFu
 			val = val[keyPath];
 		}
 
-		return res.render('secure', { inIframe: true, value: val });
+		return res.render('secure', { inIframe: true, value: val, css });
 	} catch (err) {
 		return handleAxiosErrors(err, req, res, next);
 	}
