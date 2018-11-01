@@ -1,7 +1,7 @@
 // Third-party libs
 import http from 'http';
 import chai from 'chai';
-import { ErrorWithStatusCode, handleValidationErrors, errorHandler } from '../../src/libs/error-handler';
+import { ErrorWithStatusCode, handleValidationErrors, errorHandler, handleAxiosErrors } from '../../src/libs/error-handler';
 import { stub, spy, SinonStub, SinonSpy } from 'sinon';
 import { Response, Request } from 'express';
 import * as validate from 'express-validator/check';
@@ -114,6 +114,62 @@ describe('#handleValidationErrors', function() {
 		expect(returnedErr[0]).to.not.be.undefined;
 		expect(returnedErr[0].message).to.equal(err.message);
 		expect(returnedErr[0].statusCode).to.equal(err.statusCode);
+	});
+});
+
+describe('#handleAxiosErrors', function() {
+	let nextSpy: SinonSpy;
+	let mockReq: any;
+
+	before('create spies', function() {
+		nextSpy = spy();
+	});
+
+	afterEach('reset spy history', function() {
+		nextSpy.resetHistory();
+	});
+
+	it('should call next with the given HTTP error message and status code if the callee responded with an error', function() {
+		const mockHTTPErr = {
+			response: {
+				data: {
+					message: 'There was a conflict',
+					statusCode: 409
+				}
+			}
+		};
+		const returnedError = new ErrorWithStatusCode(mockHTTPErr.response.data.message, mockHTTPErr.response.data.statusCode);
+		handleAxiosErrors(mockHTTPErr, undefined, undefined, nextSpy);
+
+		const nextErr = nextSpy.args[0][0];
+		expect(nextSpy.calledOnce).to.be.true;
+		expect(nextErr.message).to.equal(returnedError.message);
+		expect(nextErr.statusCode).to.equal(returnedError.statusCode);
+	});
+
+	it('should call next with a 502 error and no response message if the server did not respond', function() {
+		const mockHTTPErr = {
+			request: {}
+		};
+		const returnedError = new ErrorWithStatusCode('No response from storage server', 502);
+		handleAxiosErrors(mockHTTPErr, undefined, undefined, nextSpy);
+
+		const nextErr = nextSpy.args[0][0];
+		expect(nextSpy.calledOnce).to.be.true;
+		expect(nextErr.message).to.equal(returnedError.message);
+		expect(nextErr.statusCode).to.equal(returnedError.statusCode);
+	});
+
+	it('should call next with a 500 error and whatever message was provided if no response or request object is provided', function() {
+		const mockHTTPErr = new Error('Some generic error');
+
+		const returnedError = new ErrorWithStatusCode(mockHTTPErr.message, 500);
+		handleAxiosErrors(mockHTTPErr, undefined, undefined, nextSpy);
+
+		const nextErr = nextSpy.args[0][0];
+		expect(nextSpy.calledOnce).to.be.true;
+		expect(nextErr.message).to.equal(returnedError.message);
+		expect(nextErr.statusCode).to.equal(500);
 	});
 });
 
