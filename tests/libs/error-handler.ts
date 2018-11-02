@@ -119,7 +119,6 @@ describe('#handleValidationErrors', function() {
 
 describe('#handleAxiosErrors', function() {
 	let nextSpy: SinonSpy;
-	let mockReq: any;
 
 	before('create spies', function() {
 		nextSpy = spy();
