@@ -22,25 +22,11 @@ The general flow is this:
 
 3. Run `npm install`
 
-4. This app configures itself using environment variables, so let's make a folder to store an env file and place our environment variables in it: `mkdir env && touch ./env/local.env`
+4. This app configures itself using environment variables, sample env files can be found inside of `tests/env`. To do development/debug the app, you can run `source tests/env/dev.env`. If tests are being run, you should run `source tests/env/testing.env`. The only env you will need to likely change is `STORAGE_URL`, which you'll need to be correct for development purposes. Point it to the URL of your desired storage API. An explanation of each env is provided in Appendix C.
 
-5. The storage component requires 8 environment variables to run, and has a further 2 optional environment variables. Six of those eight are simply the server and client TLS details. The env file copied below is pretty much ready to go except for the storage URL. You should plug in your storage URL here (this could be a third-party URL, or localhost with a port if you're running storage locally). Simply copy the code below to `./env/local.env` and load the env into your terminal window using `source ./env/local.env`.
-```bash
-export SERVER_KEY=./src/tests/tls/server.key.pem
-export SERVER_CERT=./src/tests/tls/server.cert.pem
-export SERVER_CA_CHAIN=./src/tests/tls/intermediate.root.cert.pem
-export CLIENT_KEY=./src/tests/tls/tester.key.pem
-export CLIENT_CERT=./src/tests/tls/tester.cert.pem
-export CLIENT_CA_CHAIN=./src/tests/tls/intermediate.root.cert.pem
-export SESSION_SECRET=sskLA3f3uL3h@34V0G401o4Z0NDuYF%F
-export STORAGE_URL=https://<URL to storage>:<port>
-export ZONE=dev
-export PORT=3000
-```
+5. Run the app using `npm run watch-ts`
 
-6. Run the app using `npm run watch-ts`
-
-7. You'll need to add the CA chain as a trusted CA either in your OS's trusted CA store, or in your browser's list of trusted CAs. For development purposes, I highly recommnd just placing the CA chain inside your browser. It's easy to add and remove and you won't accidentally let a TLS cert meant for development sit around trusted by your entire OS. To do so varies per browser, but generally go to settings, find some sort of security tab, and you should see a button with the word "certificates" in it. Whatever window that opens should have some way to add new certs, at which point you can browse to the `./src/tests/tls/intermediate.root.cert.pem` file and add it. 
+6. You'll need to add the CA chain as a trusted CA either in your OS's trusted CA store, or in your browser's list of trusted CAs. For development purposes, I highly recommnd just placing the CA chain inside your browser. It's easy to add and remove and you won't accidentally let a TLS cert meant for development sit around trusted by your entire OS. To do so varies per browser, but generally go to settings, find some sort of security tab, and you should see a button with the word "certificates" in it. Whatever window that opens should have some way to add new certs, at which point you can browse to the `tests/tls/intermediate.root.cert.pem` file and add it. 
 
 ### Usage
 You can load a piece of information simply by going to a localhost URL, exactly the same way a website would place the URL inside an iframe. Go to https://localhost:3000/firstName to see the `firstName` field in your storage displayed.
@@ -52,11 +38,14 @@ The package.json scripts look daunting but in fact follow a very simple pattern 
 
 2. To run the tests and get the code-coverage, run `npm run test+cov`.
 
-3. To run just one test file, run `npm run test-some src/tests/path/to/test/file`.
+3. To run just one test file, run `npm run test-some tests/path/to/test/file`.
 
-4. To run just one test file and get the code coverage for that file, run `npm run test+cov-some src/tests/path/to/test/file`.
+4. To run just one test file and get the code coverage for that file, run `npm run test+cov-some tests/path/to/test/file`.
 
 5. If a command has `watch-` prefixed to it, the command runs and then watches for changes in files in the project, re-running the command if a change is detected; very useful for development.
+
+### Future Development: Input System
+Ideally, a website should be able to leverage decryptor to provide secured user input to the user's storage. This is a WIP.
 
 ### Appendix A: Custom ports
 Unfortunately, it's hard to guarantee one port that will work on 100% of all user systems. You can use a very unlikely to be used port, but even then, there's a slim chance some system is unable to use that port to listen on, as another service may be using it. In such cases, browser extensions, or native browser settings, could set a user-defined port and rewrite iframe requests to localhost to use that port.
@@ -78,17 +67,17 @@ The purpose of the double-buffered iframe is to ensure that the underlying data 
 The way this works is due to the combination of a session and query token. The token is only generated and set by the standard, non-secure localhost URL. Therefore, if a direct request is made, the token is not generated and the session not set, so nothing is displayed. If the webpage host decides to be clever, makes a request to the non-secure URL, gets the iframe with the query token, extracts the query token, and then makes a request to the `/secure` endpoint with the query token, that still won't work, as that request won't have a session cookie containing that same token.
 
 ### Appendix C: Explanation of env variables
-1. SERVER\_KEY: A private key used for mutual TLS communication. For testing purposes, you can use the pre-packaged TLS key provided in the test folder at `src/tests/tls/server.key.pem`. Note that this should be the actual key, not a path to the key.
+1. SERVER\_KEY: A private key used for mutual TLS communication. For testing purposes, you can use the pre-packaged TLS key provided in the test folder at `tests/tls/server.key.pem`. Note that this should be the actual key, not a path to the key.
 
-2. SERVER\_CERT: The public certificate that goes with the SERVER\_KEY. You can find one at `src/tests/tls/server.cert.pem`. This should be the actual cert, not a path to the cert.
+2. SERVER\_CERT: The public certificate that goes with the SERVER\_KEY. You can find one at `tests/tls/server.cert.pem`. This should be the actual cert, not a path to the cert.
 
-3. SERVER\_CA\_CHAIN: Chain of CAs going from the CA which signed the server cert up to a root CA recognized by the browser. You can find this at `src/tests/tls/intermediate.root.cert.pem`.
+3. SERVER\_CA\_CHAIN: Chain of CAs going from the CA which signed the server cert up to a root CA recognized by the browser. You can find this at `tests/tls/intermediate.root.cert.pem`.
 
-4. CLIENT\_KEY: The user's private key, the same one which was used to encrypt the information sent to storage. It will be used for decrypting that same information. You can find this at `src/tests/tls/tester.key.pem`.
+4. CLIENT\_KEY: The user's private key, the same one which was used to encrypt the information sent to storage. It will be used for decrypting that same information. You can find this at `tests/tls/tester.key.pem`.
 
-5. CLIENT\_CERT: The public certificate that goes with the CLIENT\_KEY. Used for mutual TLS authentication to the storage system. You can find this at `src/tests/tls/tester.cert.pem`.
+5. CLIENT\_CERT: The public certificate that goes with the CLIENT\_KEY. Used for mutual TLS authentication to the storage system. You can find this at `tests/tls/tester.cert.pem`.
 
-6. CLIENT\_CA\_CHAIN: Chain of CAs going from the CA which signed the client cert up to the user's root CA cert. You can find this at `src/tests/tls/intermediate.root.cert.pem`.
+6. CLIENT\_CA\_CHAIN: Chain of CAs going from the CA which signed the client cert up to the user's root CA cert. You can find this at `tests/tls/intermediate.root.cert.pem`.
 
 7. SESSION\_SECRET: A random token meant to generate session secrets. Can be anything. Should be regularly refreshed.
 
