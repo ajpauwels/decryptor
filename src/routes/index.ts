@@ -36,7 +36,6 @@ router.get('/', (req: Request, res: Response) => {
 router.get('/info/:keyPaths', async (req: Request, res: Response, next: NextFunction) => {
 	// Extract URL params
 	const keyPaths = req.params.keyPaths;
-	const iframeToken = req.session.iframeToken;
 	const css = req.query.css;
 
 	// Use sha256 as our hashing function
@@ -68,7 +67,7 @@ router.get('/secure/info/:keyPaths', async (req: Request, res: Response, next: N
 	// One-time use token
 	delete req.session.iframeToken;
 
-	if (queryToken !== sessionToken) {
+	if (!queryToken || !sessionToken || queryToken !== sessionToken) {
 		const err = new ErrorWithStatusCode('Rejected', 400);
 		return next(err);
 	}
