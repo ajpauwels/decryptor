@@ -84,7 +84,8 @@ export default class Util {
 	}
 
 	static trailingSlash(str: string, wantSlash: boolean): string {
-		if (!str) return str;
+		if (str.length === 0 && wantSlash) return '/';
+		else if (str.length === 0 && !wantSlash) return '';
 
 		const lastChar = str[str.length - 1];
 
