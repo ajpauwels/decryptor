@@ -18,6 +18,7 @@ import { errorHandler, ErrorWithStatusCode } from './libs/error-handler';
 
 // Routing modules
 import indexRoutes from './routes/index';
+import infoRoutes from './routes/info';
 
 // Create the express app
 const app = express();
@@ -54,6 +55,7 @@ app.use(session({
 
 // Attach express routes
 app.use('/', indexRoutes);
+app.use('/info', infoRoutes);
 
 // Attach custom error-handler
 app.use(errorHandler);
