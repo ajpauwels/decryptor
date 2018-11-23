@@ -8,8 +8,6 @@ import uuidv4 from 'uuid/v4';
 // Local libs
 import Util from '../libs/util';
 import { ErrorWithStatusCode, handleAxiosErrors } from '../libs/error-handler';
-import { qualifiedTypeIdentifier } from 'babel-types';
-import { query } from 'winston';
 
 // Attach new routes to the express router
 const router = Router();

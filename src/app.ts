@@ -1,5 +1,4 @@
 // Third-party libs
-import path from 'path';
 import express from 'express';
 import https from 'https';
 import helmet from 'helmet';
@@ -81,7 +80,6 @@ start(tlsKey, tlsCert, caChain);
  * @returns {void}
  */
 export async function start(tlsKey: string, tlsCert: string, caChain: string): Promise<https.Server> {
-	const zone = Util.getZone();
 	if (!tlsKey || !tlsCert || !caChain) throw new ErrorWithStatusCode('Missing TLS info', 400);
 
 	// Discover port to listen on
@@ -101,7 +99,7 @@ export async function start(tlsKey: string, tlsCert: string, caChain: string): P
 		logger.info(`Started in ${Util.getZone().toUpperCase()} zone listening on port ${port}`);
 	});
 
-	return new Promise<https.Server>((resolv, reject) => {
+	return new Promise<https.Server>((resolv) => {
 		return resolv(httpsServer);
 	});
 }

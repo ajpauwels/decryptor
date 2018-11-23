@@ -1,9 +1,7 @@
 // Third-party libs
-import * as path from 'path';
 import { Request, Response, NextFunction } from 'express';
 import { validationResult, Result } from 'express-validator/check';
 import Logger from './logger';
-import * as mongoose from 'mongoose';
 
 const logger = Logger.createLogger(__filename);
 

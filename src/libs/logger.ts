@@ -6,7 +6,7 @@ import * as fs from 'fs';
 import Util from './util';
 
 // Extract relevant functions from Winston
-import { Logger as WinstonLogger, LoggerOptions, createLogger, format, transports } from 'winston';
+import { Logger as WinstonLogger, createLogger, format, transports } from 'winston';
 const { combine, label, timestamp, colorize, printf } = format;
 
 export default class Logger {

@@ -1,5 +1,5 @@
 // Third-party libs
-import { Request, Response, NextFunction, Router } from 'express';
+import { Request, Response, Router } from 'express';
 
 // Attach new routes to the express router
 const router = Router();
