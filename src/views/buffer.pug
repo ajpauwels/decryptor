@@ -1,0 +1,21 @@
+html
+	head
+		link(rel='stylesheet', type='text/css', href='/css/global.css')
+
+	body
+		-
+			let qpStr = '';
+			for (const paramName in queryParams) {
+				const paramValue = queryParams[paramName];
+				if (paramValue && typeof(paramValue) === 'string') {
+					qpStr += `${paramName}=${paramValue}&`
+				}
+			}
+
+			if (qpStr && qpStr[qpStr.length - 1] === '&') {
+				qpStr = qpStr.substr(0, qpStr.length - 1);
+			} else {
+				qpStr = '';
+			}
+
+		iframe#secureIframe(src=`/${routePrefix}/secure/${keyPath || keyPaths}?${qpStr}`)

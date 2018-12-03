@@ -2,12 +2,11 @@
 import { Request, Response, NextFunction, Router } from 'express';
 import https from 'https';
 import axios from 'axios';
-import crypto from 'crypto';
-import uuidv4 from 'uuid/v4';
 
 // Local libs
 import Util from '../libs/util';
-import { ErrorWithStatusCode, handleAxiosErrors } from '../libs/error-handler';
+import Middleware from '../libs/middleware';
+import { handleAxiosErrors } from '../libs/error-handler';
 
 // Attach new routes to the express router
 const router = Router();
@@ -27,44 +26,36 @@ const clientAgent: https.Agent = new https.Agent({
 	ca: clientCAChain
 });
 
-router.get('/:keyPaths', async (req: Request, res: Response, next: NextFunction) => {
+router.get('/:keyPaths', (req: Request, res: Response) => {
 	// Extract URL params
 	const keyPaths = req.params.keyPaths;
 	const css = req.query.css;
 
-	// Use sha256 as our hashing function
-	const sha256 = crypto.createHash('sha256');
-
-	// Create the security token
-	const time = new Date();
-	const token = uuidv4();
-	const valueToHash = `${time.toUTCString()} ${token}`;
-
-	sha256.update(valueToHash, 'utf8');
-
-	const hashedValue = sha256.digest('hex');
+	// Generate the secure token
+	const token = Util.getBufferToken();
 
 	// Set the token in the user's session
-	req.session.iframeToken = hashedValue;
+	req.session[token] = true;
 
 	// Render the iframe
-	return res.render('iframe', { keyPaths, hashedValue, css });
+	return res.render('buffer', {
+		routePrefix: 'info',
+		keyPaths,
+		queryParams: {
+			token,
+			css
+		}
+	});
 });
 
-router.get('/secure/:keyPaths', async (req: Request, res: Response, next: NextFunction) => {
+router.get('/secure/:keyPaths', Middleware.verifyBufferTokens, async (req: Request, res: Response, next: NextFunction) => {
 	// Extract URL params
 	const keyPaths = req.params.keyPaths;
-	const queryToken = req.query.iframeToken;
-	const sessionToken = req.session.iframeToken;
+	const queryToken = req.query.token;
 	const css = req.query.css;
 
 	// One-time use token
-	delete req.session.iframeToken;
-
-	if (!queryToken || !sessionToken || queryToken !== sessionToken) {
-		const err = new ErrorWithStatusCode('Rejected', 400);
-		return next(err);
-	}
+	delete req.session[queryToken];
 
 	try {
 		// Make the request as the given client
@@ -84,7 +75,7 @@ router.get('/secure/:keyPaths', async (req: Request, res: Response, next: NextFu
 			val = val[keyPath];
 		}
 
-		return res.render('secure', { inIframe: true, value: val, css });
+		return res.render('secure/info', { inIframe: true, value: val, css });
 	} catch (err) {
 		return handleAxiosErrors(err, req, res, next);
 	}

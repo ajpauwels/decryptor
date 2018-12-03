@@ -1,6 +1,24 @@
 import fs from 'fs';
+import crypto from 'crypto';
+import uuidv4 from 'uuid/v4';
 
 export default class Util {
+	static getBufferToken(): string {
+		// Use sha256 as our hashing function
+		const sha256 = crypto.createHash('sha256');
+
+		// Create the security token
+		const time = new Date();
+		const token = uuidv4();
+		const valueToHash = `${time.toUTCString()} ${token}`;
+
+		sha256.update(valueToHash, 'utf8');
+
+		const hashedValue = sha256.digest('hex');
+
+		return hashedValue;
+	}
+
 	static getZone(): string {
 		// Establish which zone we're running in
 		const envZONE = process.env['ZONE'];
