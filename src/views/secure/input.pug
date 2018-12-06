@@ -6,8 +6,8 @@ html
 
 	body
 		if inIframe
-			form(action=`/secure/${keyPath}?token=${token}`, method='post')
-				input(type='text')
+			form(action=`/input/secure/${keyPath}?token=${token}${css ? '&css=' + css : ''}`, method='post')
+				input(type='text', name='input-text')
 				p#passphraseContainer turtle-wagon
 		else
 			p

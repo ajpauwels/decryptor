@@ -9,8 +9,6 @@ export default class Middleware {
 			return next(err);
 		}
 
-		console.log(req.query);
-		console.log(req.session);
 		const sessionToken = req.session[queryToken];
 		if (!sessionToken || typeof (sessionToken) !== 'boolean' || sessionToken !== true) {
 			const err = new ErrorWithStatusCode('Rejected', 400);
