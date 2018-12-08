@@ -145,7 +145,7 @@ describe('Util', function() {
 			process.env['SERVER_KEY'] = './tests/tls/badpath.key.pem';
 
 			try {
-				const serverKey = Util.getServerKey();
+				Util.getServerKey();
 			} catch (err) {
 				expect(err).to.be.an.instanceof(Error);
 				expect(err.message).to.equal("ENOENT: no such file or directory, open './tests/tls/badpath.key.pem'");
@@ -192,7 +192,7 @@ describe('Util', function() {
 			process.env['SERVER_CERT'] = './tests/tls/badpath.cert.pem';
 
 			try {
-				const serverCert = Util.getServerCert();
+				Util.getServerCert();
 			} catch (err) {
 				expect(err).to.be.an.instanceof(Error);
 				expect(err.message).to.equal("ENOENT: no such file or directory, open './tests/tls/badpath.cert.pem'");
@@ -239,7 +239,7 @@ describe('Util', function() {
 			process.env['SERVER_CA_CHAIN'] = './tests/tls/badpath.cert.pem';
 
 			try {
-				const serverCAChain = Util.getServerCAChain();
+				Util.getServerCAChain();
 			} catch (err) {
 				expect(err).to.be.an.instanceof(Error);
 				expect(err.message).to.equal("ENOENT: no such file or directory, open './tests/tls/badpath.cert.pem'");
@@ -286,7 +286,7 @@ describe('Util', function() {
 			process.env['CLIENT_KEY'] = './tests/tls/badpath.key.pem';
 
 			try {
-				const clientKey = Util.getClientKey();
+				Util.getClientKey();
 			} catch (err) {
 				expect(err).to.be.an.instanceof(Error);
 				expect(err.message).to.equal("ENOENT: no such file or directory, open './tests/tls/badpath.key.pem'");
@@ -333,7 +333,7 @@ describe('Util', function() {
 			process.env['CLIENT_CERT'] = './tests/tls/badpath.cert.pem';
 
 			try {
-				const clientCert = Util.getClientCert();
+				Util.getClientCert();
 			} catch (err) {
 				expect(err).to.be.an.instanceof(Error);
 				expect(err.message).to.equal("ENOENT: no such file or directory, open './tests/tls/badpath.cert.pem'");
@@ -380,7 +380,7 @@ describe('Util', function() {
 			process.env['CLIENT_CA_CHAIN'] = './tests/tls/badpath.cert.pem';
 
 			try {
-				const clientCAChain = Util.getClientCAChain();
+				Util.getClientCAChain();
 			} catch (err) {
 				expect(err).to.be.an.instanceof(Error);
 				expect(err.message).to.equal("ENOENT: no such file or directory, open './tests/tls/badpath.cert.pem'");

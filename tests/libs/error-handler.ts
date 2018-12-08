@@ -4,8 +4,6 @@ import chai from 'chai';
 import { ErrorWithStatusCode, handleValidationErrors, errorHandler, handleAxiosErrors } from '../../src/libs/error-handler';
 import { stub, spy, SinonStub, SinonSpy } from 'sinon';
 import { Response, Request } from 'express';
-import * as validate from 'express-validator/check';
-import { validationResult, Result } from 'express-validator/check';
 
 const { expect } = chai;
 
@@ -213,7 +211,7 @@ describe('ErrorWithStatusCode', function() {
 			const err = new ErrorWithStatusCode(expectedStatusMsg, expectedStatusCode);
 			err.extra = { a: 'a' };
 
-			const handleSpy = spy(err, 'handle');
+			spy(err, 'handle');
 			err.handle(undefined, resObj, undefined);
 
 			expect(statusStub.calledOnceWith(400)).to.be.true;

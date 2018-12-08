@@ -2,13 +2,12 @@
 import chai from 'chai';
 import fetch from 'node-fetch';
 import fs from 'fs';
-import path from 'path';
 import https from 'https';
 import pug from 'pug';
 import { SinonStub, stub } from 'sinon';
 import axios from 'axios';
 
-import { start as startServer, stop as stopServer } from '../../src/app';
+import { start as startServer } from '../../src/app';
 import Util from '../../src/libs/util';
 import { ErrorWithStatusCode } from '../../src/libs/error-handler';
 
@@ -44,7 +43,7 @@ describe('GET /info/:keyPaths', function() {
 	let compiledIFrameView: Function;
 
 	before('compile pug view', function() {
-		compiledIFrameView = pug.compileFile('./src/views/iframe.pug');
+		compiledIFrameView = pug.compileFile('./src/views/buffer.pug');
 	});
 
 	describe('with no keypaths', function() {
@@ -71,7 +70,7 @@ describe('GET /info/:keyPaths', function() {
 
 			expect(htmlResp).to.be.a('string').and.not.be.empty;
 
-			const rx = /\?iframeToken=([a-z0-9]+)/;
+			const rx = /\?token=([a-z0-9]+)/;
 			const rxResult = rx.exec(htmlResp);
 
 			expect(rxResult).to.not.be.undefined;
@@ -82,8 +81,11 @@ describe('GET /info/:keyPaths', function() {
 			const token = rxResult[1];
 
 			const htmlCompiled = compiledIFrameView({
-				keyPaths: 'somePath',
-				hashedValue: token
+				queryParams: {
+					token
+				},
+				keyPath: 'somePath',
+				routePrefix: 'info'
 			});
 
 			expect(htmlResp).to.equal(htmlCompiled);
@@ -102,7 +104,7 @@ describe('GET /info/:keyPaths', function() {
 
 			expect(htmlResp).to.be.a('string').and.not.be.empty;
 
-			const rx = /\?iframeToken=([a-z0-9]+)/;
+			const rx = /\?token=([a-z0-9]+)/;
 			const rxResult = rx.exec(htmlResp);
 
 			expect(rxResult).to.not.be.undefined;
@@ -113,8 +115,11 @@ describe('GET /info/:keyPaths', function() {
 			const token = rxResult[1];
 
 			const htmlCompiled = compiledIFrameView({
+				queryParams: {
+					token
+				},
 				keyPaths: 'somePath,someOtherPath',
-				hashedValue: token
+				routePrefix: 'info'
 			});
 
 			expect(htmlResp).to.equal(htmlCompiled);
@@ -131,7 +136,7 @@ describe('GET /info/:keyPaths', function() {
 
 			const htmlResp = await res.text();
 
-			const rx = /\?iframeToken=([a-z0-9]+)/;
+			const rx = /\?token=([a-z0-9]+)/;
 			const rxResult = rx.exec(htmlResp);
 
 			expect(rxResult).to.not.be.undefined;
@@ -142,9 +147,12 @@ describe('GET /info/:keyPaths', function() {
 			const token = rxResult[1];
 
 			const htmlCompiled = compiledIFrameView({
+				queryParams: {
+					token,
+					css: 'p { color: red }',
+				},
 				keyPaths: 'somePath',
-				hashedValue: token,
-				css: 'p { color: red }'
+				routePrefix: 'info'
 			});
 
 			expect(htmlResp).to.equal(htmlCompiled);
@@ -152,12 +160,12 @@ describe('GET /info/:keyPaths', function() {
 	});
 });
 
-describe('GET /secure/info/:keyPaths', function() {
+describe('GET /info/secure/:keyPaths', function() {
 	let compiledSecureView: Function;
 	let axiosGetStub: SinonStub;
 
 	before('compile the secure.pug view', function() {
-		compiledSecureView = pug.compileFile('./src/views/secure.pug');
+		compiledSecureView = pug.compileFile('./src/views/secure/info.pug');
 	});
 
 	before('stub out the axios.get function', function() {
@@ -169,12 +177,12 @@ describe('GET /secure/info/:keyPaths', function() {
 	});
 
 	before('compile pug view', function() {
-		compiledSecureView = pug.compileFile('./src/views/secure.pug');
+		compiledSecureView = pug.compileFile('./src/views/secure/info.pug');
 	});
 
 	describe('with no keypaths', function() {
 		it('should respond with a 404 status', async function() {
-			const res = await fetch(`https://localhost:${port}/secure/info/`, {
+			const res = await fetch(`https://localhost:${port}/info/secure/`, {
 				agent: new https.Agent({
 					ca: caCert
 				})
@@ -186,7 +194,7 @@ describe('GET /secure/info/:keyPaths', function() {
 
 	describe('with neither query nor session tokens', function() {
 		it('should respond with a 400 status and message saying \'Rejected\'', async function() {
-			const res = await fetch(`https://localhost:${port}/secure/info/somePath`, {
+			const res = await fetch(`https://localhost:${port}/info/secure/somePath`, {
 				agent: new https.Agent({
 					ca: caCert
 				})
@@ -209,7 +217,7 @@ describe('GET /secure/info/:keyPaths', function() {
 
 			const htmlResp = await nonSecureRes.text();
 
-			const rx = /\?iframeToken=([a-z0-9]+)/;
+			const rx = /\?token=([a-z0-9]+)/;
 			const rxResult = rx.exec(htmlResp);
 
 			expect(rxResult).to.not.be.undefined;
@@ -219,7 +227,7 @@ describe('GET /secure/info/:keyPaths', function() {
 
 			const token = rxResult[1];
 
-			const res = await fetch(`https://localhost:${port}/secure/info/somePath?iframeToken=${token}`, {
+			const res = await fetch(`https://localhost:${port}/info/secure/somePath?token=${token}`, {
 				agent: new https.Agent({
 					ca: caCert
 				})
@@ -254,7 +262,7 @@ describe('GET /secure/info/:keyPaths', function() {
 
 			const cookieValue = cookieRxRes[1];
 
-			const res = await fetch(`https://localhost:${port}/secure/info/somePath`, {
+			const res = await fetch(`https://localhost:${port}/info/secure/somePath`, {
 				agent: new https.Agent({
 					ca: caCert
 				}),
@@ -292,7 +300,7 @@ describe('GET /secure/info/:keyPaths', function() {
 
 			const cookieValue = cookieRxRes[1];
 
-			const res = await fetch(`https://localhost:${port}/secure/info/somePath?iframeToken=notCorrect`, {
+			const res = await fetch(`https://localhost:${port}/info/secure/somePath?token=notCorrect`, {
 				agent: new https.Agent({
 					ca: caCert
 				}),
@@ -345,7 +353,7 @@ describe('GET /secure/info/:keyPaths', function() {
 
 				const htmlResp = await nonSecureRes.text();
 
-				const rx = /\?iframeToken=([a-z0-9]+)/;
+				const rx = /\?token=([a-z0-9]+)/;
 				const rxResult = rx.exec(htmlResp);
 
 				expect(rxResult).to.not.be.undefined;
@@ -355,7 +363,7 @@ describe('GET /secure/info/:keyPaths', function() {
 
 				const token = rxResult[1];
 
-				const secureRes = await fetch(`https://localhost:${port}/secure/info/somePath?iframeToken=${token}`, {
+				const secureRes = await fetch(`https://localhost:${port}/info/secure/somePath?token=${token}`, {
 					agent: new https.Agent({
 						ca: caCert
 					}),
@@ -413,7 +421,7 @@ describe('GET /secure/info/:keyPaths', function() {
 
 				const htmlResp = await nonSecureRes.text();
 
-				const rx = /\?iframeToken=([a-z0-9]+)/;
+				const rx = /\?token=([a-z0-9]+)/;
 				const rxResult = rx.exec(htmlResp);
 
 				expect(rxResult).to.not.be.undefined;
@@ -423,7 +431,7 @@ describe('GET /secure/info/:keyPaths', function() {
 
 				const token = rxResult[1];
 
-				const secureRes = await fetch(`https://localhost:${port}/secure/info/somePath?iframeToken=${token}`, {
+				const secureRes = await fetch(`https://localhost:${port}/info/secure/somePath?token=${token}`, {
 					agent: new https.Agent({
 						ca: caCert
 					}),

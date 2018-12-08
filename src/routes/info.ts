@@ -6,7 +6,7 @@ import axios from 'axios';
 // Local libs
 import Util from '../libs/util';
 import Middleware from '../libs/middleware';
-import { handleAxiosErrors } from '../libs/error-handler';
+import { handleAxiosErrors, ErrorWithStatusCode } from '../libs/error-handler';
 
 // Attach new routes to the express router
 const router = Router();
@@ -24,6 +24,10 @@ const clientAgent: https.Agent = new https.Agent({
 	key: clientKey,
 	cert: clientCert,
 	ca: clientCAChain
+});
+
+router.get('/secure', (req: Request, res: Response, next: NextFunction) => {
+	return next(new ErrorWithStatusCode('Not Found', 404));
 });
 
 router.get('/:keyPaths', (req: Request, res: Response) => {
@@ -56,6 +60,11 @@ router.get('/secure/:keyPaths', Middleware.verifyBufferTokens, async (req: Reque
 
 	// One-time use token
 	delete req.session[queryToken];
+
+	if (!keyPaths || typeof (keyPaths) !== 'string') {
+		const err = new ErrorWithStatusCode('Not Found', 404);
+		return next(err);
+	}
 
 	try {
 		// Make the request as the given client

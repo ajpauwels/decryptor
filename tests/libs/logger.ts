@@ -1,8 +1,6 @@
 // Third-party libs
 import chai from 'chai';
 import Logger from '../../src/libs/logger';
-// import { Logger as WinstonLogger } from 'winston';
-import * as winston from 'winston';
 
 const { expect } = chai;
 
