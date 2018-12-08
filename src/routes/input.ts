@@ -6,6 +6,7 @@ import axios from 'axios';
 // Local libs
 import Middleware from '../libs/middleware';
 import Util from '../libs/util';
+import { handleAxiosErrors, ErrorWithStatusCode } from '../libs/error-handler';
 
 // Attach new routes to the express router
 const router = Router();
@@ -26,6 +27,12 @@ const clientAgent: https.Agent = new https.Agent({
 });
 
 // support following tags
+// if only /input/secure is provided, return 404
+router.get('/secure', (req: Request, res: Response, next: NextFunction) => {
+	const err = new ErrorWithStatusCode('Not Found', 404);
+	return next(err);
+});
+
 /*
 - select
 - option
@@ -55,20 +62,41 @@ router.get('/:keyPath', async (req: Request, res: Response, next: NextFunction) 
 
 router.get('/secure/:keyPath', Middleware.verifyBufferTokens, async (req: Request, res: Response, next: NextFunction) => {
 	// Extract URL params
-	const keyPath = req.params.keyPath;
+	const keyPath = req.params.keyPath.split(',')[0];
 	const css = req.query.css;
 	const queryToken = req.query.token;
 
 	// One-time use token
 	delete req.session[queryToken];
 
-	// Create new token for submitting
-	const token = Util.getBufferToken();
+	try {
+		// Make the request as the given client
+		const storageRes = await axios.get(`${storageURL}/users/info/${keyPath}`, {
+			httpsAgent: clientAgent
+		});
 
-	// Set the token in the user's session
-	req.session[token] = true;
+		// Extra data from storage response
+		const data = storageRes.data;
 
-	return res.render('secure/input', { inIframe: true, keyPath, css, token });
+		// Extract key path keys to traverse the response
+		const keyPathsArr: string[] = keyPath.split('.');
+
+		// Use key path keys to extract final value and return it
+		let val = data;
+		for (const keyPath of keyPathsArr) {
+			val = val[keyPath];
+		}
+
+		// Create new token for submitting
+		const token = Util.getBufferToken();
+
+		// Set the token in the user's session
+		req.session[token] = true;
+
+		return res.render('secure/input', { inIframe: true, keyPath, value: val, css, token });
+	} catch (err) {
+		return handleAxiosErrors(err, req, res, next);
+	}
 });
 
 router.post('/secure/:keyPath', Middleware.verifyBufferTokens, async (req: Request, res: Response, next: NextFunction) => {
@@ -110,9 +138,9 @@ router.post('/secure/:keyPath', Middleware.verifyBufferTokens, async (req: Reque
 		// Set the token in the user's session
 		req.session[token] = true;
 
-		return res.render('secure/input', { inIframe: true, keyPath, css, token });
+		return res.render('secure/input', { inIframe: true, keyPath, css, token, value: inputText });
 	} catch (err) {
-		console.log(err);
+		return handleAxiosErrors(err, req, res, next);
 	}
 });
 

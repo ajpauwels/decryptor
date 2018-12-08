@@ -61,11 +61,6 @@ router.get('/secure/:keyPaths', Middleware.verifyBufferTokens, async (req: Reque
 	// One-time use token
 	delete req.session[queryToken];
 
-	if (!keyPaths || typeof (keyPaths) !== 'string') {
-		const err = new ErrorWithStatusCode('Not Found', 404);
-		return next(err);
-	}
-
 	try {
 		// Make the request as the given client
 		const storageRes = await axios.get(`${storageURL}/users/info/${keyPaths}`, {
