@@ -1,0 +1,14 @@
+html
+	head
+		link(rel='stylesheet', type='text/css', href='/css/global.css')
+		if css
+			style= css
+
+	body
+		if inIframe
+			form(action=`/input/secure/${keyPath}?token=${token}${css ? '&css=' + css : ''}`, method='post')
+				input(type='text', name='input-text', value=value)
+				p#passphraseContainer turtle-wagon
+		else
+			p
+

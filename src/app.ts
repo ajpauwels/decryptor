@@ -1,5 +1,4 @@
 // Third-party libs
-import path from 'path';
 import express from 'express';
 import https from 'https';
 import helmet from 'helmet';
@@ -18,6 +17,8 @@ import { errorHandler, ErrorWithStatusCode } from './libs/error-handler';
 
 // Routing modules
 import indexRoutes from './routes/index';
+import infoRoutes from './routes/info';
+import inputRoutes from './routes/input';
 
 // Create the express app
 const app = express();
@@ -54,6 +55,8 @@ app.use(session({
 
 // Attach express routes
 app.use('/', indexRoutes);
+app.use('/info', infoRoutes);
+app.use('/input', inputRoutes);
 
 // Attach custom error-handler
 app.use(errorHandler);
@@ -79,7 +82,6 @@ start(tlsKey, tlsCert, caChain);
  * @returns {void}
  */
 export async function start(tlsKey: string, tlsCert: string, caChain: string): Promise<https.Server> {
-	const zone = Util.getZone();
 	if (!tlsKey || !tlsCert || !caChain) throw new ErrorWithStatusCode('Missing TLS info', 400);
 
 	// Discover port to listen on
@@ -99,7 +101,7 @@ export async function start(tlsKey: string, tlsCert: string, caChain: string): P
 		logger.info(`Started in ${Util.getZone().toUpperCase()} zone listening on port ${port}`);
 	});
 
-	return new Promise<https.Server>((resolv, reject) => {
+	return new Promise<https.Server>((resolv) => {
 		return resolv(httpsServer);
 	});
 }

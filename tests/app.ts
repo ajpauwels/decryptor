@@ -1,7 +1,7 @@
 // Third-party libs
 import chai from 'chai';
-import { start, stop } from '../src/app';
-import { spy, stub, SinonSpy, SinonStub } from 'sinon';
+import { start } from '../src/app';
+import { spy, SinonSpy } from 'sinon';
 import { ErrorWithStatusCode } from '../src/libs/error-handler';
 import fs from 'fs';
 import { Server } from 'https';
@@ -27,7 +27,7 @@ describe('app', function() {
 				it('should throw a 400 error', async function() {
 					let err: ErrorWithStatusCode;
 					try {
-						const server = await start(undefined, undefined, undefined);
+						await start(undefined, undefined, undefined);
 					} catch (e) {
 						err = e;
 					}
